@@ -1,0 +1,117 @@
+version: "1.0"
+name: "Conveyor Safety Policy"
+description: "Safety enforcement rules for automated conveyor operations"
+
+policies:
+  temperature_limits:
+    description: "Temperature-based safety controls"
+    rules:
+      - condition: "telemetry.features.temperature_c > 85"
+        action: "emergency_stop"
+        reason: "Motor temperature exceeds critical threshold (85°C)"
+        required: true
+      
+      - condition: "telemetry.features.temperature_c > 75"
+        action: "reduce_speed"
+        parameters:
+          reduction_percent: 50
+        reason: "Motor temperature approaching critical levels"
+        required: true
+      
+      - condition: "telemetry.features.temperature_c > 70"
+        action: "alert_maintenance"
+        parameters:
+          priority: "high"
+        reason: "Elevated motor temperature detected"
+        required: false
+
+  vibration_limits:
+    description: "Vibration-based safety controls"
+    rules:
+      - condition: "telemetry.features.vibration_rms > 8.0"
+        action: "emergency_stop"
+        reason: "Excessive vibration detected - potential mechanical failure"
+        required: true
+      
+      - condition: "telemetry.features.vibration_rms > 6.0"
+        action: "reduce_speed"
+        parameters:
+          reduction_percent: 30
+        reason: "High vibration levels detected"
+        required: true
+
+  torque_limits:
+    description: "Torque-based safety controls"
+    rules:
+      - condition: "telemetry.features.torque_nm > 800"
+        action: "emergency_stop"
+        reason: "Torque exceeds maximum safe operating limit"
+        required: true
+      
+      - condition: "telemetry.features.torque_nm > 600"
+        action: "alert_maintenance"
+        parameters:
+          priority: "medium"
+        reason: "High torque load detected"
+        required: false
+
+  audio_commands:
+    description: "Audio command safety validation"
+    rules:
+      - condition: "audio.transcript == 'stop' or audio.transcript == 'emergency'"
+        action: "emergency_stop"
+        reason: "Emergency stop command received via audio"
+        required: true
+      
+      - condition: "audio.transcript == 'slow down'"
+        action: "reduce_speed"
+        parameters:
+          reduction_percent: 25
+        reason: "Speed reduction requested via audio"
+        required: false
+
+blocked_actions:
+  - action: "emergency_stop"
+    condition: "session_age_minutes < 1"
+    reason: "Cannot emergency stop within first minute of session (startup protection)"
+  
+  - action: "reduce_speed"
+    condition: "current_speed_percent < 20"
+    reason: "Cannot reduce speed below 20% of nominal"
+
+time_windows:
+  maintenance_hours:
+    start: "02:00"
+    end: "06:00"
+    timezone: "UTC"
+    description: "Scheduled maintenance window"
+    
+  production_hours:
+    start: "06:00"
+    end: "22:00"
+    timezone: "UTC"
+    description: "Production operating hours"
+
+escalation:
+  temperature_critical:
+    triggers:
+      - "3 consecutive temperature violations in 5 minutes"
+      - "temperature_c > 90"
+    actions:
+      - "emergency_stop"
+      - "alert_maintenance"
+      - "log_incident"
+    
+  vibration_critical:
+    triggers:
+      - "vibration_rms > 9.0"
+      - "5 consecutive vibration violations"
+    actions:
+      - "emergency_stop"
+      - "alert_maintenance"
+
+logging:
+  all_decisions: true
+  blocked_actions: true
+  policy_violations: true
+  retention_days: 90

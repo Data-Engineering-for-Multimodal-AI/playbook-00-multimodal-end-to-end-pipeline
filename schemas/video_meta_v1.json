@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Video Metadata v1",
+  "type": "object",
+  "required": ["ts", "session_id", "frame_uri", "frame_number"],
+  "properties": {
+    "ts": { "type": "string", "format": "date-time" },
+    "session_id": { "type": "string" },
+    "frame_uri": {
+      "type": "string",
+      "pattern": "^gs://.*",
+      "description": "GCS URI of the video frame"
+    },
+    "frame_number": { "type": "integer", "minimum": 0 },
+    "fps": { "type": "integer", "minimum": 1, "maximum": 120 }
+  }
+}

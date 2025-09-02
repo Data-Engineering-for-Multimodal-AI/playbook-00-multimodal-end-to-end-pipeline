@@ -1,0 +1,49 @@
+steps:
+  # Install dependencies
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Install Python and pip
+        apt-get update
+        apt-get install -y python3 python3-pip unzip
+        
+        # Install Kaggle API
+        pip3 install kaggle
+        
+        # Setup Kaggle credentials
+        mkdir -p /root/.kaggle
+        echo '{"username":"${_KAGGLE_USERNAME}","key":"${_KAGGLE_KEY}"}' > /root/.kaggle/kaggle.json
+        chmod 600 /root/.kaggle/kaggle.json
+        
+        # List available datasets from ramyharik
+        echo "Available datasets from ramyharik:"
+        kaggle datasets list -s ramyharik
+        
+        # Download datasets
+        mkdir -p /workspace/datasets
+        cd /workspace/datasets
+        
+        # Download 2024 Future Factories multimodal datasets (starting with part 1)
+        echo "Downloading FF 2024-08-13 Multi-Modal Dataset Part 1/3..."
+        kaggle datasets download -d ramyharik/ff-2024-08-13-multi-modal-dataset-13 --unzip
+        
+        echo "Part 1/3 download completed, checking contents..."
+        ls -la
+        
+        # For now, let's just upload part 1 to see the structure
+        # We can run separate jobs for parts 2 and 3 due to their large size
+        
+        # Upload to GCS
+        gsutil -m cp -r . gs://your-project-id-resolve-binaries/datasets/future-factories/
+        
+        echo "Dataset download completed"
+        gsutil ls gs://your-project-id-resolve-binaries/datasets/future-factories/
+
+substitutions:
+  _KAGGLE_USERNAME: 'your-kaggle-username'
+  _KAGGLE_KEY: 'your-kaggle-key'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
