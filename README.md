@@ -130,7 +130,7 @@ Addresses a critical gap—public industrial datasets with both anomalies and mu
 
 In our playbook, this dataset becomes the lab testbed to prove the pipeline works—not just on paper, but in real-world aligned data. It allows us to skip the fusion engine when inputs are already synchronized, but still execute agentic, bounded decision-making with full safety observability.
 
-**Citation:** Harik, R., El Kalach, F., Samaha, J., Clark, D., Sander, D., Samaha, P., Burns, L., Yousif, I., Gadow, V., Tarekegne, T., & Saha, N. (2024). Analog and Multi-modal Manufacturing Datasets Acquired on the Future Factories Platform. *arXiv preprint arXiv:2401.15544*. https://arxiv.org/abs/2401.15544
+**Citation:** Harik, R., El Kalach, F., Samaha, J., Clark, D., Sander, D., Samaha, P., Burns, L., Yousif, I., Gadow, V., Tarekegne, T., & Saha, N. (2024). Analog and Multi-modal Manufacturing Datasets Acquired on the Future Factories Platform. *arXiv:2401.15544 [cs.LG]*. https://doi.org/10.48550/arXiv.2401.15544
 
 ## Technology Stack
 
@@ -159,9 +159,9 @@ For questions and support:
 
 ## Acknowledgments
 
-We thank the original dataset creators and the UCI Machine Learning Repository for making these valuable datasets available for research and development.
-
 Special acknowledgment to the Future Factories Lab at the University of South Carolina for providing the industry-grade multimodal manufacturing datasets that serve as the foundation for this pipeline.
+
+We thank the research team led by Ramy Harik for making these valuable datasets available for research and development in manufacturing AI.
 
 ## License
 
