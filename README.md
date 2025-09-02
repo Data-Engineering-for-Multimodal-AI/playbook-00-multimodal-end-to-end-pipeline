@@ -1,4 +1,4 @@
-# Resolve Agent: Multimodal AI Pipeline for Manufacturing
+# End to End Multimodal Pipeline
 
 A production-ready multimodal AI pipeline for manufacturing that ingests sensor data, images, and historical records to generate intelligent action plans using Google Cloud Platform and Vertex AI.
 
@@ -108,12 +108,29 @@ The pipeline processes real manufacturing data and generates intelligent action 
 }
 ```
 
-## Data Sources
+## Lab Data: The Future Factories Dataset
 
-The pipeline is designed for the **Future Factories** multimodal dataset:
-- **Sensor Data**: JSON files with timestamped measurements
-- **Images**: Manufacturing cell camera feeds  
-- **Historical Data**: Excel files with operational baselines
+To build and validate the Resolve Agent, we use a real-world dataset from the Future Factories Lab at the University of South Carolina. This dataset is a rare commodity in manufacturing AI—open-source, high-fidelity, and purpose-built for developing intelligent systems.
+
+**What It Contains:**
+
+Two industry-grade datasets collected during continuous assembly-line runs, using industrial-grade robots, conveyors, actuators, sensors, and cameras.
+
+One dataset is analog, time-series sensor telemetry, capturing every nuance of the manufacturing process over a sustained runtime.
+
+The other is multi-modal, aligning those sensor readings with synchronized images. This pairing simulates how a smart system "sees and feels" what's happening.
+
+**Why It Matters:**
+
+Anomalies are injected deliberately—parts are removed during assembly (e.g., missing nose cone), creating ground truth defects to train AI fault detection.
+
+Data is realistic and structured: Sensor data in CSV or JSON logs; images batch-organized and precisely aligned.
+
+Addresses a critical gap—public industrial datasets with both anomalies and multimodal signals are rare. This dataset fills that gap and serves as a robust foundation for building and testing AI-driven manufacturing pipelines.
+
+In our playbook, this dataset becomes the lab testbed to prove the pipeline works—not just on paper, but in real-world aligned data. It allows us to skip the fusion engine when inputs are already synchronized, but still execute agentic, bounded decision-making with full safety observability.
+
+**Citation:** Harik, R., El Kalach, F., Samaha, J., Clark, D., Sander, D., Samaha, P., Burns, L., Yousif, I., Gadow, V., Tarekegne, T., & Saha, N. (2024). Analog and Multi-modal Manufacturing Datasets Acquired on the Future Factories Platform. *arXiv preprint arXiv:2401.15544*. https://arxiv.org/abs/2401.15544
 
 ## Technology Stack
 
@@ -144,8 +161,19 @@ For questions and support:
 
 We thank the original dataset creators and the UCI Machine Learning Repository for making these valuable datasets available for research and development.
 
+Special acknowledgment to the Future Factories Lab at the University of South Carolina for providing the industry-grade multimodal manufacturing datasets that serve as the foundation for this pipeline.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**MIT License**  
+Copyright (c) 2025 Data Engineering for Multimodal AI
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 **Note**: This is a prototype implementation for demonstration purposes. Production deployment requires additional security hardening, compliance validation, and regulatory approval.
