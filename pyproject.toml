@@ -1,0 +1,27 @@
+[project]
+name = "playbook-00-multimodal-end-to-end-pipeline"
+version = "2026.10"
+description = "End-to-end multimodal pipeline on the Future Factories data: local by default, Google Cloud optional"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2",
+    "pyarrow>=17",
+    "pyyaml>=6.0",
+    "jsonschema>=4.23",
+    "pillow>=11",
+    "requests>=2.32",
+    "kaggle>=1.7",       # download_data.py
+]
+
+[project.optional-dependencies]
+# The cloud version (cloud/): Cloud Run services, Pub/Sub, BigQuery, Gemini
+cloud = ["google-cloud-storage>=2.18", "google-cloud-bigquery>=3.27", "google-cloud-pubsub>=2.27",
+         "google-genai>=1.0", "fastapi>=0.115", "uvicorn>=0.34", "httpx>=0.27", "openpyxl>=3.1"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+package = false
