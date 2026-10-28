@@ -12,8 +12,8 @@ from typing import Dict, List, Optional, Any
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
 from google.cloud import storage, pubsub_v1, bigquery
-import vertexai
-from vertexai.generative_models import GenerativeModel, Part
+from google import genai
+from google.genai import types
 from pydantic import BaseModel
 import httpx
 
@@ -33,17 +33,18 @@ app = FastAPI(title="AI Planner", version="2.0")
 # Configuration
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
 LOCATION = os.getenv("VERTEX_AI_LOCATION", "us-central1")
-GCS_BUCKET = "your-project-id-resolve-binaries"
+GCS_BUCKET = os.getenv("GCS_BUCKET", f"{PROJECT_ID}-resolve-binaries")
 SAFETY_API_URL = os.getenv("SAFETY_API_URL", "http://localhost:8083")
 
 # Initialize clients
 storage_client = storage.Client()
 publisher = pubsub_v1.PublisherClient()
 bigquery_client = bigquery.Client()
-vertexai.init(project=PROJECT_ID, location=LOCATION)
+# google-genai on Vertex AI (the vertexai SDK's generative module was removed in June 2026)
+genai_client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
 # Initialize Gemini model
-gemini_model = GenerativeModel("gemini-2.5-flash-lite")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")   # check the current model list before deploying
 
 # Pub/Sub topics
 ACTIONS_TOPIC = f"projects/{PROJECT_ID}/topics/actions.v1"
@@ -110,21 +111,19 @@ def analyze_deviations(current_data: Dict[str, Any], baselines: Dict[str, Any]) 
     try:
         # Analyze VFD temperatures
         vfd_temps = current_data.get("features", {}).get("vfd_temperatures", [])
+        # The drives belong to the conveyor (Conveyor_Signals), not to the robots
+        conveyor = baselines.get("conveyor_system", {})
         for i, temp in enumerate(vfd_temps, 1):
-            robot_component = f"r0{i}"
-            if robot_component in baselines:
-                for metric, baseline in baselines[robot_component].items():
-                    if "temperature" in metric.lower():
-                        deviation = abs(temp - baseline["mean"]) / baseline["std"] if baseline["std"] > 0 else 0
-                        deviations[f"vfd{i}_temperature"] = {
-                            "current": temp,
-                            "baseline_mean": baseline["mean"],
-                            "baseline_std": baseline["std"],
-                            "deviation_score": deviation,
-                            "status": "critical" if deviation > 3 else "warning" if deviation > 2 else "normal"
-                        }
-        
-        # Analyze conveyor speeds
+            baseline = conveyor.get(f"q_vfd{i}_temperature")
+            if baseline:
+                deviation = abs(temp - baseline["mean"]) / baseline["std"] if baseline["std"] > 0 else 0
+                deviations[f"vfd{i}_temperature"] = {
+                    "current": temp,
+                    "baseline_mean": baseline["mean"],
+                    "baseline_std": baseline["std"],
+                    "deviation_score": deviation,
+                    "status": "critical" if deviation > 3 else "warning" if deviation > 2 else "normal"
+                }
         conveyor_speeds = current_data.get("features", {}).get("conveyor_speeds", [])
         if "conveyor_system" in baselines:
             for i, speed in enumerate(conveyor_speeds, 1):
@@ -164,7 +163,7 @@ def download_image_for_analysis(image_uri: str) -> Optional[Part]:
         image_data = blob.download_as_bytes()
         
         # Create image part for Gemini
-        image_part = Part.from_data(mime_type="image/png", data=image_data)
+        image_part = types.Part.from_bytes(data=image_data, mime_type="image/png")
         return image_part
         
     except Exception as e:
@@ -302,7 +301,7 @@ async def create_action_plan(request: PlanningRequest, background_tasks: Backgro
         logger.info("Calling Gemini 2.5 Flash-Lite for enhanced multimodal analysis...")
         
         content_parts = [prompt] + image_parts
-        response = gemini_model.generate_content(content_parts)
+        response = genai_client.models.generate_content(model=GEMINI_MODEL, contents=content_parts)
         
         # Parse response
         try:
@@ -422,7 +421,7 @@ async def health_check():
     
     try:
         # Check Vertex AI connectivity
-        test_model = GenerativeModel("gemini-2.5-flash-lite")
+        genai_client.models.get(model=GEMINI_MODEL)
         health_status["vertex_ai"] = "connected"
         
         # Check BigQuery connectivity
@@ -432,7 +431,7 @@ async def health_check():
         health_status["bigquery"] = "connected"
         
         # Check GCS connectivity
-        bucket = storage_client.bucket("your-project-id-resolve-binaries")
+        bucket = storage_client.bucket(GCS_BUCKET)
         blob_count = len(list(bucket.list_blobs(max_results=1)))
         health_status["gcs"] = "connected"
         

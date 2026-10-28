@@ -31,7 +31,7 @@ app = FastAPI(title="Data Ingester", version="2.0")
 
 # Configuration
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
-GCS_BUCKET = "your-project-id-resolve-binaries"
+GCS_BUCKET = os.getenv("GCS_BUCKET", f"{PROJECT_ID}-resolve-binaries")
 MULTIMODAL_PATH = "datasets/future-factories/multimodal-2024-data/Batch 1"
 
 # Initialize clients
