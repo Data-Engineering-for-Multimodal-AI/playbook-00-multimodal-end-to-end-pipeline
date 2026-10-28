@@ -52,8 +52,8 @@ gcloud services enable \
     aiplatform.googleapis.com
 
 # Clone the repository
-git clone <repository-url>
-cd resolve-agent
+git clone https://github.com/Data-Engineering-for-Multimodal-AI/playbook-00-multimodal-end-to-end-pipeline.git
+cd playbook-00-multimodal-end-to-end-pipeline/cloud
 
 # Install Python dependencies
 pip install -r requirements.txt
@@ -452,7 +452,7 @@ Task: Analyze for anomalies and recommend actions.
 
 ```bash
 # Run the complete pipeline verification
-python run_pipeline.py
+python run_pipeline_cloud.py
 ```
 
 **Expected Output**:

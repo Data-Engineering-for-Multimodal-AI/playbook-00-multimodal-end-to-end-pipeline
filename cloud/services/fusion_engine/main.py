@@ -65,7 +65,8 @@ def should_fuse_now(session_id: str, trace_id: str) -> bool:
     
     # Fuse if we have both telemetry and images
     has_telemetry = "telemetry" in window
-    has_images = "images" in window and len(window["images"]) > 0
+    # Wait for every camera's image (the dataset has two per reading); fusing on the first dropped the second
+    has_images = len(window.get("images", [])) >= int(os.getenv("IMAGES_PER_READING", "2"))
     
     return has_telemetry and has_images
 

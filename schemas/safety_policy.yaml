@@ -1,117 +1,38 @@
-version: "1.0"
-name: "Conveyor Safety Policy"
-description: "Safety enforcement rules for automated conveyor operations"
+# Rules for the Future Factories cell, on the signals the data has. The planner checks every fused
+# reading against them; the safety check then validates each proposed action against the tool registry.
+#
+# Conditions: "<field> <op> <value>", joined with "and". Fields are sensor names from the data, plus:
+#   max_vfd_temperature   hottest of the four conveyor drives (degrees C)
+#   conveyor_moving       true when any conveyor speed is above 0
+#   z.<sensor>            (value - historical mean) / historical std, from the 30-hour analog baselines
+#
+# Thresholds come from the data: the drives run at 85-93 C (analog dataset, 1st-99th percentile), so a
+# fixed 85 C limit, as in the first edition, would stop the line most of the day.
+version: "2.0"
+name: "Future Factories cell safety policy"
 
-policies:
-  temperature_limits:
-    description: "Temperature-based safety controls"
-    rules:
-      - condition: "telemetry.features.temperature_c > 85"
-        action: "emergency_stop"
-        reason: "Motor temperature exceeds critical threshold (85°C)"
-        required: true
-      
-      - condition: "telemetry.features.temperature_c > 75"
-        action: "reduce_speed"
-        parameters:
-          reduction_percent: 50
-        reason: "Motor temperature approaching critical levels"
-        required: true
-      
-      - condition: "telemetry.features.temperature_c > 70"
-        action: "alert_maintenance"
-        parameters:
-          priority: "high"
-        reason: "Elevated motor temperature detected"
-        required: false
+rules:
+  - name: door_open_while_moving
+    condition: "I_SafetyDoor1_Status == false and conveyor_moving == true"
+    action: emergency_stop
+    parameters: {zone: cell, reason: "Safety door 1 open while the conveyor runs"}
+  - name: door2_open_while_moving
+    condition: "I_SafetyDoor2_Status == false and conveyor_moving == true"
+    action: emergency_stop
+    parameters: {zone: cell, reason: "Safety door 2 open while the conveyor runs"}
+  - name: drive_overheating
+    condition: "max_vfd_temperature > 100"
+    action: reduce_speed
+    parameters: {reduction_percent: 50, zone: conveyor}
+  - name: drive_hotter_than_usual
+    condition: "z.max_vfd_temperature > 3"
+    action: alert_maintenance
+    parameters: {priority: high, description: "A conveyor drive is more than 3 standard deviations hotter than usual"}
+  - name: gripper_overload_r03
+    condition: "z.I_R03_Gripper_Load > 6"
+    action: alert_maintenance
+    parameters: {priority: medium, description: "Robot 3 gripper load far above its usual range"}
 
-  vibration_limits:
-    description: "Vibration-based safety controls"
-    rules:
-      - condition: "telemetry.features.vibration_rms > 8.0"
-        action: "emergency_stop"
-        reason: "Excessive vibration detected - potential mechanical failure"
-        required: true
-      
-      - condition: "telemetry.features.vibration_rms > 6.0"
-        action: "reduce_speed"
-        parameters:
-          reduction_percent: 30
-        reason: "High vibration levels detected"
-        required: true
-
-  torque_limits:
-    description: "Torque-based safety controls"
-    rules:
-      - condition: "telemetry.features.torque_nm > 800"
-        action: "emergency_stop"
-        reason: "Torque exceeds maximum safe operating limit"
-        required: true
-      
-      - condition: "telemetry.features.torque_nm > 600"
-        action: "alert_maintenance"
-        parameters:
-          priority: "medium"
-        reason: "High torque load detected"
-        required: false
-
-  audio_commands:
-    description: "Audio command safety validation"
-    rules:
-      - condition: "audio.transcript == 'stop' or audio.transcript == 'emergency'"
-        action: "emergency_stop"
-        reason: "Emergency stop command received via audio"
-        required: true
-      
-      - condition: "audio.transcript == 'slow down'"
-        action: "reduce_speed"
-        parameters:
-          reduction_percent: 25
-        reason: "Speed reduction requested via audio"
-        required: false
-
-blocked_actions:
-  - action: "emergency_stop"
-    condition: "session_age_minutes < 1"
-    reason: "Cannot emergency stop within first minute of session (startup protection)"
-  
-  - action: "reduce_speed"
-    condition: "current_speed_percent < 20"
-    reason: "Cannot reduce speed below 20% of nominal"
-
-time_windows:
-  maintenance_hours:
-    start: "02:00"
-    end: "06:00"
-    timezone: "UTC"
-    description: "Scheduled maintenance window"
-    
-  production_hours:
-    start: "06:00"
-    end: "22:00"
-    timezone: "UTC"
-    description: "Production operating hours"
-
-escalation:
-  temperature_critical:
-    triggers:
-      - "3 consecutive temperature violations in 5 minutes"
-      - "temperature_c > 90"
-    actions:
-      - "emergency_stop"
-      - "alert_maintenance"
-      - "log_incident"
-    
-  vibration_critical:
-    triggers:
-      - "vibration_rms > 9.0"
-      - "5 consecutive vibration violations"
-    actions:
-      - "emergency_stop"
-      - "alert_maintenance"
-
-logging:
-  all_decisions: true
-  blocked_actions: true
-  policy_violations: true
-  retention_days: 90
+# Applied by the safety check, after planning
+constraints:
+  min_seconds_between_same_action: 60   # one alert per zone and action per minute, not one per reading
