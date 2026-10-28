@@ -1,0 +1,33 @@
+name: smoke
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    # A synthetic fixture stands in for the Kaggle data, which needs an account
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.0
+      - name: Tests
+        run: make smoke
+      - name: pip install -r requirements.txt, then the pipeline on the fixture
+        run: |
+          uv venv --seed --python ${{ matrix.python-version }} /tmp/pipenv
+          /tmp/pipenv/bin/python -m pip install -q -r requirements.txt
+          /tmp/pipenv/bin/python tests/fixture.py /tmp/fixture
+          RESOLVE_DATA=/tmp/fixture RESOLVE_OUTPUT=/tmp/out /tmp/pipenv/bin/python run_pipeline.py
+          /tmp/pipenv/bin/python download_data.py --help > /dev/null
+      - name: The cloud version installs and compiles
+        run: |
+          /tmp/pipenv/bin/python -m pip install -q -r cloud/requirements.txt
+          /tmp/pipenv/bin/python -m py_compile cloud/services/*/main.py cloud/deploy.py cloud/run_pipeline_cloud.py
