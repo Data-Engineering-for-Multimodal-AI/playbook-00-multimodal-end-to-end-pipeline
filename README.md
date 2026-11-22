@@ -225,7 +225,7 @@ This playbook runs locally on a fixture. Before you run something like it on a r
 | Where you run it | Cost |
 |---|---|
 | Your machine | $0. The local mode needs no API keys and calls no paid service. The clone is about 1 MB; the real data (step 5) about 830 MB, with a free Kaggle account. |
-| A GitHub Codespace (2 cores, 8 GB, the default size; this repo doesn't ask for more) | Estimated $0.18 per hour at GitHub's list price (November 2026). A free personal account includes 120 core-hours a month, about 60 hours on this machine. |
+| A GitHub Codespace (2 cores, 8 GB, the default size; this repo doesn't ask for more) | Estimated $0.18 per hour at GitHub's list price (November 2026). A free personal account includes 120 core-hours a month, about 60 hours on this machine. In CI, `make run` in a freshly built devcontainer printed its first output after 2 s, because the dependencies are installed when the container is created. |
 | Google Cloud (`python deploy.py`) | Not estimated yet. The local mode never calls Gemini, so we have no measured token counts per action plan, and we couldn't read the current prices from the [Cloud Run](https://cloud.google.com/run/pricing) and [Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/pricing) pricing pages for this update. Note that `fusion-engine` is deployed with one instance always running. |
 
 ## How it works
