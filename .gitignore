@@ -53,3 +53,11 @@ debug.log
 # Temporary files
 *.tmp
 temp/
+
+# uv and pytest
+.venv/
+.pytest_cache/
+
+# Local pipeline: downloaded data and output
+data/
+output/

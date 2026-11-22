@@ -595,9 +595,9 @@ def analyze_with_custom_model(sensor_data):
 ### Learning Resources
 
 **Google Cloud Documentation**:
-- [Cloud Run Best Practices](https://cloud.google.com/run/docs/best-practices)
+- [Cloud Run General Development Tips](https://cloud.google.com/run/docs/tips/general)
 - [Vertex AI Documentation](https://cloud.google.com/vertex-ai/docs)
-- [Pub/Sub Patterns](https://cloud.google.com/pubsub/docs/patterns)
+- [Pub/Sub Publish and Subscribe Patterns](https://cloud.google.com/pubsub/docs/pubsub-basics#choose_a_publish_and_subscribe_pattern)
 
 **Sample Datasets**:
 - Explore more Future Factories data

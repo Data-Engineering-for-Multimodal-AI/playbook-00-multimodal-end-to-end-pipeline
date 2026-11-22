@@ -30,6 +30,30 @@ Historical Processor → BigQuery Baselines ──────┘
 3. **Fusion Engine**: Correlates sensor data with images using time windows
 4. **AI Planner**: Uses Gemini for multimodal analysis with historical context
 
+## Run locally (no cloud account)
+
+A local mode runs the same stages in one process: ingest with schema validation, historical
+baselines, fusion, rule-based planning, a safety check, and storage in SQLite. It needs Python 3.12+
+and [uv](https://docs.astral.sh/uv/). Or open the repo in GitHub Codespaces, which runs `make setup` for you.
+
+```bash
+git clone https://github.com/Data-Engineering-for-Multimodal-AI/playbook-00-multimodal-end-to-end-pipeline.git
+cd playbook-00-multimodal-end-to-end-pipeline
+
+make setup     # uv sync --frozen
+make run       # the pipeline on a small synthetic fixture; prints each stage
+make smoke     # tests on the fixture
+make clean     # remove output/ and caches
+```
+
+`make run` uses a synthetic stand-in for the data, so it needs no account. To run on the real
+Future Factories data, put a Kaggle API token in `~/.kaggle/kaggle.json` (or set `KAGGLE_USERNAME`
+and `KAGGLE_KEY`) and run `make run-real`. It downloads a slice of the data into `data/` and runs
+`python run_local.py`.
+
+The Google Cloud steps below are unchanged. The three services that read Cloud Storage take the
+bucket name from `GCS_BUCKET` (default `your-project-id-resolve-binaries`).
+
 ## Quick Start
 
 ### Prerequisites

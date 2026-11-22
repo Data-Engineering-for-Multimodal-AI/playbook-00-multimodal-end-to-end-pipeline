@@ -33,7 +33,7 @@ app = FastAPI(title="AI Planner", version="2.0")
 # Configuration
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
 LOCATION = os.getenv("VERTEX_AI_LOCATION", "us-central1")
-GCS_BUCKET = "your-project-id-resolve-binaries"
+GCS_BUCKET = os.getenv("GCS_BUCKET", "your-project-id-resolve-binaries")
 SAFETY_API_URL = os.getenv("SAFETY_API_URL", "http://localhost:8083")
 
 # Initialize clients
@@ -432,7 +432,7 @@ async def health_check():
         health_status["bigquery"] = "connected"
         
         # Check GCS connectivity
-        bucket = storage_client.bucket("your-project-id-resolve-binaries")
+        bucket = storage_client.bucket(GCS_BUCKET)
         blob_count = len(list(bucket.list_blobs(max_results=1)))
         health_status["gcs"] = "connected"
         

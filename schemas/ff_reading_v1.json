@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Future Factories reading v1",
+  "description": "One synchronized reading of the multimodal dataset: sensor values and the two camera images.",
+  "type": "object",
+  "required": ["ts", "sensor_values", "images"],
+  "properties": {
+    "ts": {"type": "string"},
+    "images": {"type": "array", "items": {"type": "string"}, "maxItems": 2},
+    "sensor_values": {
+      "type": "object",
+      "required": ["Q_VFD1_Temperature", "Q_VFD2_Temperature", "Q_VFD3_Temperature", "Q_VFD4_Temperature",
+                   "M_Conv1_Speed_mmps", "M_Conv2_Speed_mmps", "M_Conv3_Speed_mmps", "M_Conv4_Speed_mmps",
+                   "I_SafetyDoor1_Status", "I_SafetyDoor2_Status", "Q_Cell_CycleCount"],
+      "properties": {
+        "Q_VFD1_Temperature": {"type": "number", "minimum": -40, "maximum": 150},
+        "Q_VFD2_Temperature": {"type": "number", "minimum": -40, "maximum": 150},
+        "Q_VFD3_Temperature": {"type": "number", "minimum": -40, "maximum": 150},
+        "Q_VFD4_Temperature": {"type": "number", "minimum": -40, "maximum": 150},
+        "M_Conv1_Speed_mmps": {"type": "number", "minimum": 0, "maximum": 1000},
+        "M_Conv2_Speed_mmps": {"type": "number", "minimum": 0, "maximum": 1000},
+        "M_Conv3_Speed_mmps": {"type": "number", "minimum": 0, "maximum": 1000},
+        "M_Conv4_Speed_mmps": {"type": "number", "minimum": 0, "maximum": 1000},
+        "I_SafetyDoor1_Status": {"type": "boolean", "description": "true = closed"},
+        "I_SafetyDoor2_Status": {"type": "boolean", "description": "true = closed"},
+        "Q_Cell_CycleCount": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

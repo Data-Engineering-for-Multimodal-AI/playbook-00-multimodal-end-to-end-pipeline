@@ -1,0 +1,50 @@
+name: smoke
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"   # weekly, Monday 06:00 UTC, so breakage in upstream packages shows up
+
+jobs:
+  smoke:
+    # A synthetic fixture stands in for the Kaggle data. Nothing here calls Google Cloud or Kaggle.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.0
+      - name: Smoke test
+        run: make smoke
+      - name: One-command run
+        run: make run
+      - name: Printed install path (pip install -r requirements.txt), cloud commands parse without calling Google Cloud
+        run: |
+          uv venv --seed --python ${{ matrix.python-version }} /tmp/pipenv
+          /tmp/pipenv/bin/python -m pip install -q -r requirements.txt
+          /tmp/pipenv/bin/python deploy.py --help
+          /tmp/pipenv/bin/python run_pipeline.py --help
+          /tmp/pipenv/bin/python -m py_compile services/*/main.py
+      - name: Local pipeline with pip (pip install -r requirements-local.txt)
+        run: |
+          /tmp/pipenv/bin/python -m pip install -q -r requirements-local.txt
+          /tmp/pipenv/bin/python tests/fixture.py /tmp/fixture
+          RESOLVE_DATA=/tmp/fixture RESOLVE_OUTPUT=/tmp/out /tmp/pipenv/bin/python run_local.py
+          /tmp/pipenv/bin/python download_data.py --help > /dev/null
+
+  devcontainer:
+    # Builds .devcontainer/ the way Codespaces does and runs the playbook inside it.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the devcontainer and run the playbook
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: make run
