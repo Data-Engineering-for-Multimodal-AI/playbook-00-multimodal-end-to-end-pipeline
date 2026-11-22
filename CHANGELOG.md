@@ -32,3 +32,7 @@ every existing path stays where it was.
   the bucket name. They now read `GCS_BUCKET`, with the old name as the default. The AI planner's
   health check uses the same setting. From `update-2026`.
 - Two links in `TUTORIAL.md` returned 404. They now point to the current Cloud Run and Pub/Sub pages.
+
+### Changed
+- README opening: a title that says what you'll do, three sentences on why, the example and what you'll do, then the data engineering problem and what you'll work with.
+

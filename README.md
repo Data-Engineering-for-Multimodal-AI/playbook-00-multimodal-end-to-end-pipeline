@@ -1,6 +1,11 @@
-# End to End Multimodal Pipeline
+# Playbook 00: Turn factory sensor and camera data into an action plan
+**How to build an end-to-end multimodal pipeline on Google Cloud.** A companion playbook for [*Data Engineering for Multimodal AI*](https://oreil.ly/data-engineering-multimodal) (O'Reilly, 2026). Not printed in the book.
 
-A production-ready multimodal AI pipeline for manufacturing that ingests sensor data, images, and historical records to generate intelligent action plans using Google Cloud Platform and Vertex AI.
+A factory produces sensor readings, camera images and historical records, and an operator needs one plan of action from all of them. In this repo, we explore this with the Future Factories dataset. Follow along to run four services that ingest the data and ask Gemini for an action plan, locally with mocks or on Google Cloud.
+
+**The problem.** Sensors, images and history each tell part of the story, and one decision needs all three.
+
+**What you'll work with.** You'll split the pipeline into services, ingest each modality, ask an LLM (Gemini) to analyze them together, and use local mocks in place of the cloud services.
 
 ## Overview
 
