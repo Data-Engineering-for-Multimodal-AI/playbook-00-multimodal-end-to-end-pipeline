@@ -391,6 +391,8 @@ Special acknowledgment to the Future Factories Lab at the University of South Ca
 
 We thank the research team led by Ramy Harik for making these valuable datasets available for research and development in manufacturing AI.
 
+If this playbook helped you, a star helps other readers find it.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
