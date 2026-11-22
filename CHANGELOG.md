@@ -9,6 +9,16 @@ change from `main`. That branch's move of the Google Cloud files to `cloud/` was
 every existing path stays where it was.
 
 ### Added
+- `make query` (`scripts/query.py`): read-only SQL against the SQLite store.
+- `make check-data DIR=...` and `make load DIR=...` (`scripts/own_data.py`): check a folder of your
+  own data in the layout of `data/`, and run the local pipeline on it (`output/own/`). Tests in
+  `tests/test_own_data.py`; `make smoke` still runs only `tests/test_pipeline.py`.
+- Three measured experiments on synthetic data: `make try-fusion-timeout`, `make try-rate-limit`,
+  `make try-bad-values` (`experiments/`).
+- README: Run it, time tiers, Try this, Use your own data, What you end up with, Before production,
+  What it costs.
+- CI: the Run it steps with checks on their output, the own-data checks, the three experiments, and
+  the time to first output in the devcontainer job.
 - A local mode that needs no cloud account: `run_local.py` and the `resolve/` package (ingest
   with schema validation, historical baselines, fusion, rule-based planning, a safety check,
   SQLite). New schemas for it: `schemas/ff_reading_v1.json` and `schemas/ff_safety_policy_v1.yaml`.
@@ -34,5 +44,7 @@ every existing path stays where it was.
 - Two links in `TUTORIAL.md` returned 404. They now point to the current Cloud Run and Pub/Sub pages.
 
 ### Changed
+- README: the local steps are now "Run it"; "Overview" is now "How it works"; the Google Cloud
+  "Quick Start" is now "Run it the way the book does", with the same content.
 - README opening: a title that says what you'll do, three sentences on why, the example and what you'll do, then the data engineering problem and what you'll work with.
 

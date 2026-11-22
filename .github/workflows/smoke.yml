@@ -24,6 +24,32 @@ jobs:
         run: make smoke
       - name: One-command run
         run: make run
+      # README "Run it", steps 2 to 4, as written
+      - name: Run it, steps 2 to 4
+        run: |
+          make run | tee /tmp/run.txt
+          grep -q "5. Safety:    approved {'emergency_stop': 2, 'alert_maintenance': 1}; blocked {'same action within 60 s': 2}" /tmp/run.txt
+          make query | tee /tmp/query.txt
+          grep -q "(5 rows)" /tmp/query.txt
+          grep -qE "emergency_stop +door2_open_while_moving +blocked +same action within 60 s" /tmp/query.txt
+          make smoke | tee /tmp/smoke.txt
+          grep -q "4 passed" /tmp/smoke.txt
+      - name: Use your own data (file checks)
+        run: |
+          uv run --frozen pytest -q tests/test_own_data.py
+          uv run --frozen python tests/fixture.py /tmp/my_cell > /dev/null
+          make check-data DIR=/tmp/my_cell | tee /tmp/check.txt
+          grep -q "OK, 10 readings" /tmp/check.txt
+          make load DIR=/tmp/my_cell | tee /tmp/load.txt
+          grep -q "6. Store:     output/own/resolve.db" /tmp/load.txt
+      - name: Try this 1 to 3
+        run: |
+          make try-fusion-timeout | tee /tmp/try1.txt
+          grep -qE "^ +5s +1,791 +209 +108 +1.5s +6.0s$" /tmp/try1.txt
+          make try-rate-limit | tee /tmp/try2.txt
+          grep -qE "^ +600s +1 +209 +1 +0$" /tmp/try2.txt
+          make try-bad-values | tee /tmp/try3.txt
+          grep -qE "^ +1 +1.49e\+35 +-0.02 +no +90.0 +7.1 +yes$" /tmp/try3.txt
       - name: Printed install path (pip install -r requirements.txt), cloud commands parse without calling Google Cloud
         run: |
           uv venv --seed --python ${{ matrix.python-version }} /tmp/pipenv
@@ -47,4 +73,4 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           push: never
-          runCmd: make run
+          runCmd: start=$(date +%s) && make run && echo "Time to first output in a clean devcontainer was $(( $(date +%s) - start )) s"
