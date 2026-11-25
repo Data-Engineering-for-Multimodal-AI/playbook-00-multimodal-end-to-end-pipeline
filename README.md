@@ -1,5 +1,15 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/header-dark.png">
+  <img src="docs/img/header-light.png" alt="Playbook 00, a starter for Data Engineering for Multimodal AI. Build: an end-to-end pipeline on Google Cloud. Data: sensors, images and records." width="100%">
+</picture>
+
 # Playbook 00: Turn factory sensor and camera data into an action plan
 **How to build an end-to-end multimodal pipeline on Google Cloud.** A companion playbook for [*Data Engineering for Multimodal AI*](https://oreil.ly/data-engineering-multimodal) (O'Reilly, 2026). Not printed in the book.
+
+[![Tests](https://github.com/Data-Engineering-for-Multimodal-AI/playbook-00-multimodal-end-to-end-pipeline/actions/workflows/smoke.yml/badge.svg?branch=main)](https://github.com/Data-Engineering-for-Multimodal-AI/playbook-00-multimodal-end-to-end-pipeline/actions/workflows/smoke.yml)
+![Python 3.12 | 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-1f1a19?labelColor=6b6361)
+[![License: MIT](https://img.shields.io/badge/license-MIT-1f1a19?labelColor=6b6361)](LICENSE)
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in-Codespaces-b4422e?logo=github&labelColor=6b6361)](https://codespaces.new/Data-Engineering-for-Multimodal-AI/playbook-00-multimodal-end-to-end-pipeline?quickstart=1)
 
 A factory produces sensor readings, camera images and historical records, and an operator needs one plan of action from all of them. In this repo, we explore this with the Future Factories dataset. Follow along to run four services that ingest the data and ask Gemini for an action plan, locally with mocks or on Google Cloud.
 
@@ -230,6 +240,17 @@ This playbook runs locally on a fixture. Before you run something like it on a r
 
 ## How it works
 
+```mermaid
+flowchart LR
+  A["Ingest<br/>schema check on each reading"] --> C["Fusion<br/>readings joined with camera images"]
+  B["Baselines<br/>analog sensor history"] --> D["Planning<br/>policy rules, optional LLM"]
+  C --> D
+  D --> E["Safety check<br/>rate limit per action"]
+  E --> F["Store<br/>action plans in SQLite"]
+  classDef key fill:#ffe8e3,stroke:#b4422e,color:#1f1a19
+  class C key
+```
+
 This pipeline processes multimodal data from manufacturing systems (Future Factories dataset) and provides intelligent analysis using:
 
 - **Real-time sensor data** (temperatures, speeds, gripper loads)
@@ -393,11 +414,19 @@ We thank the research team led by Ramy Harik for making these valuable datasets 
 
 If this playbook helped you, a star helps other readers find it.
 
+## Troubleshooting
+
+**`make data` stops with "Kaggle login failed".** The download needs a Kaggle API token. Put it in `~/.kaggle/kaggle.json`, or set `KAGGLE_USERNAME` and `KAGGLE_KEY`, then run `make data` again.
+
+**`make check-data` reports "a Git LFS pointer, not the file".** The real file was never fetched. Run `git lfs pull`, then `make check-data DIR=my_cell` again.
+
+**`make check-data` reports timestamps "the pipeline can't read".** Write them in ISO 8601, like `2023-12-11 13:00:00.000`, and keep them in order.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The datasets and models this playbook uses keep their own licenses. See [DATA_LICENSES.md](DATA_LICENSES.md).
+The datasets and models this playbook uses keep their own licenses. See [DATA_SOURCES.md](DATA_SOURCES.md).
 
 **MIT License**  
 Copyright (c) 2025 Data Engineering for Multimodal AI
@@ -409,3 +438,8 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 **Note**: This is a prototype implementation for demonstration purposes. Production deployment requires additional security hardening, compliance validation, and regulatory approval.
+
+---
+
+[The book](https://oreil.ly/data-engineering-multimodal) · [All playbooks](https://github.com/Data-Engineering-for-Multimodal-AI#playbooks) · Previous: [Playbook 00: CLIP claims](https://github.com/Data-Engineering-for-Multimodal-AI/playbook-00-multimodal-ai-CLIP-claims-pipeline) · Next: [Playbook 00: GTZAN](https://github.com/Data-Engineering-for-Multimodal-AI/playbook-00-multimodal-feature-store-GTZAN)
+<!-- Substack post for this playbook: add link here -->
