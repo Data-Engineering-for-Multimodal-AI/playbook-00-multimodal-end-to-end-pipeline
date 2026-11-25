@@ -397,6 +397,8 @@ If this playbook helped you, a star helps other readers find it.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+The datasets and models this playbook uses keep their own licenses. See [DATA_LICENSES.md](DATA_LICENSES.md).
+
 **MIT License**  
 Copyright (c) 2025 Data Engineering for Multimodal AI
 

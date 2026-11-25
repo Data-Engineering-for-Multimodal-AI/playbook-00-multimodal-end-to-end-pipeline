@@ -61,3 +61,6 @@ temp/
 # Local pipeline: downloaded data and output
 data/
 output/
+
+# written by a passing `make run`; read by `make card` in the .github repo
+.playbook-done

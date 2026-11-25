@@ -16,6 +16,7 @@ run: setup
 	uv run --frozen python tests/fixture.py $(FIXTURE)/data > /dev/null
 	@echo "Synthetic fixture in $(FIXTURE)/data (a stand-in for the Future Factories data)"
 	RESOLVE_DATA=$(FIXTURE)/data RESOLVE_OUTPUT=$(FIXTURE)/out uv run --frozen python run_local.py
+	@echo "playbook-00-multimodal-end-to-end-pipeline" > .playbook-done
 
 # After make run: query the SQLite store yourself (default: the action plans).
 #   make query SQL="SELECT * FROM rejected_readings"
