@@ -12,8 +12,8 @@ from typing import Dict, List, Optional, Any
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
 from google.cloud import storage, pubsub_v1, bigquery
-import vertexai
-from vertexai.generative_models import GenerativeModel, Part
+from google import genai
+from google.genai import types
 from pydantic import BaseModel
 import httpx
 
@@ -40,10 +40,9 @@ SAFETY_API_URL = os.getenv("SAFETY_API_URL", "http://localhost:8083")
 storage_client = storage.Client()
 publisher = pubsub_v1.PublisherClient()
 bigquery_client = bigquery.Client()
-vertexai.init(project=PROJECT_ID, location=LOCATION)
-
-# Initialize Gemini model
-gemini_model = GenerativeModel("gemini-2.5-flash-lite")
+# Gemini on Vertex AI, through the Google Gen AI SDK
+genai_client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+GEMINI_MODEL = "gemini-2.5-flash-lite"
 
 # Pub/Sub topics
 ACTIONS_TOPIC = f"projects/{PROJECT_ID}/topics/actions.v1"
@@ -146,7 +145,7 @@ def analyze_deviations(current_data: Dict[str, Any], baselines: Dict[str, Any]) 
         logger.error(f"Failed to analyze deviations: {e}")
         return {}
 
-def download_image_for_analysis(image_uri: str) -> Optional[Part]:
+def download_image_for_analysis(image_uri: str) -> Optional[types.Part]:
     """Download image from GCS for Gemini analysis"""
     try:
         # Parse GCS URI
@@ -164,7 +163,7 @@ def download_image_for_analysis(image_uri: str) -> Optional[Part]:
         image_data = blob.download_as_bytes()
         
         # Create image part for Gemini
-        image_part = Part.from_data(mime_type="image/png", data=image_data)
+        image_part = types.Part.from_bytes(data=image_data, mime_type="image/png")
         return image_part
         
     except Exception as e:
@@ -302,7 +301,7 @@ async def create_action_plan(request: PlanningRequest, background_tasks: Backgro
         logger.info("Calling Gemini 2.5 Flash-Lite for enhanced multimodal analysis...")
         
         content_parts = [prompt] + image_parts
-        response = gemini_model.generate_content(content_parts)
+        response = genai_client.models.generate_content(model=GEMINI_MODEL, contents=content_parts)
         
         # Parse response
         try:
@@ -422,7 +421,7 @@ async def health_check():
     
     try:
         # Check Vertex AI connectivity
-        test_model = GenerativeModel("gemini-2.5-flash-lite")
+        genai_client.models.get(model=GEMINI_MODEL)
         health_status["vertex_ai"] = "connected"
         
         # Check BigQuery connectivity
