@@ -304,6 +304,8 @@ python deploy.py --project-id YOUR_PROJECT_ID --region us-central1
 python run_pipeline.py
 ```
 
+For this repository, `<repository-url>` is `https://github.com/Data-Engineering-for-Multimodal-AI/playbook-00-multimodal-end-to-end-pipeline.git`, and the folder it creates is `playbook-00-multimodal-end-to-end-pipeline`, not `resolve-agent`.
+
 ## Tutorial Guide
 
 For detailed step-by-step instructions, see [TUTORIAL.md](TUTORIAL.md)
@@ -389,7 +391,7 @@ In our playbook, this dataset becomes the lab testbed to prove the pipeline work
 - **Data Storage**: Cloud Storage, BigQuery
 - **Messaging**: Cloud Pub/Sub
 - **Infrastructure**: Terraform
-- **Languages**: Python 3.11, FastAPI
+- **Languages**: Python (3.12 or later locally; the Cloud Run images use `python:3.11-slim`), FastAPI
 
 ## Contributing
 
