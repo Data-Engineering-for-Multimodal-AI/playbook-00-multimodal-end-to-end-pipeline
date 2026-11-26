@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (v1.1.0)
+## v1.1.0 (2026-11-26)
 
 Not printed in the book. Nothing the book shows has changed.
 
@@ -36,6 +36,9 @@ every existing path stays where it was.
   the `pip install -r requirements.txt` path with `deploy.py --help` and `run_pipeline.py --help`,
   and a job that builds the devcontainer and runs `make run` inside it. CI makes no Google Cloud
   or Kaggle calls.
+- `DATA_SOURCES.md`: the datasets and models this playbook uses, with their licenses and citations.
+- `make run` writes `.playbook-done` when it passes (ignored by git). `make card` in the
+  organization's `.github` repository reads these files and draws a completion card.
 
 ### Fixed
 - `services/data_ingester`, `services/historical_processor` and `services/ai_planner` hard-coded
@@ -47,4 +50,13 @@ every existing path stays where it was.
 - README: the local steps are now "Run it"; "Overview" is now "How it works"; the Google Cloud
   "Quick Start" is now "Run it the way the book does", with the same content.
 - README opening: a title that says what you'll do, three sentences on why, the example and what you'll do, then the data engineering problem and what you'll work with.
+- README: a header image (light and dark), badges for CI, Python, license and Codespaces, a diagram at
+  the top of "How it works", and a footer that links the book, all playbooks, and the previous and
+  next playbook.
+- README: a Troubleshooting section with three common problems and their fixes.
+- The AI planner (`services/ai_planner/main.py`) uses the `google-genai` SDK instead of the deprecated
+  `vertexai.generative_models`. `requirements.txt` lists `google-genai` in place of
+  `google-cloud-aiplatform` and `vertexai`.
+- README: the clone URL and folder name, and the Python versions (3.12 or later locally; the Cloud Run
+  images use `python:3.11-slim`).
 
